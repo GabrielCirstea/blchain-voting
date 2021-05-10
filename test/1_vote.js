@@ -7,4 +7,15 @@ contract("Voting", accounts => {
 		const count = await app.getProposalCount(0);
 		assert.equal(count.valueOf(), 0);
 	});
+
+	it("sa si votam", async() =>{
+		const app = await Voting.deployed();
+		await app.addProposal("vot");
+		let count = await app.getProposalCount(0);
+		assert.equal(count.valueOf(), 0);
+		await app.vote(0);
+		await app.vote(0, {from: accounts[1]});
+		count = await app.getProposalCount(0);
+		assert.equal(count.valueOf(), 2);
+	});
 });
