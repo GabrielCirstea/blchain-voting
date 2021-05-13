@@ -13,12 +13,19 @@ contract Voting{
     }
     
     mapping(address => bool) public voted;
+    mapping(address => uint) whatVote;
     
     Proposal[] public proposals;
     
     address public chairperson;
     
     event LogVote(address indexed voterAddress, string name, uint8 votes);
+    
+    modifier NotVoted(){
+        address voter = msg.sender;
+	    require(voted[voter] == false);
+	    _;
+    }
     
     
     constructor() public {
@@ -31,7 +38,7 @@ contract Voting{
         proposals.push(Proposal({
                 name: proposalName,
                 voteCount: 0
-            })
+                })
             );
     }
 
@@ -42,8 +49,11 @@ contract Voting{
 	function getProposalCount(uint proposal) public view returns (uint) {
 		return proposals[proposal].voteCount;
 	}
+	function getNumProposals() public view returns (uint){
+	    return proposals.length;
+	}
     
-    function vote(uint proposal) public {
+    function vote(uint proposal) public payable NotVoted{
         address voter = msg.sender;
 		// ar trebui facut ceva care sa dea o eroare cand o persoana a votat deja
 		// vrem ca o persoana sa voteze o singura data
@@ -51,9 +61,23 @@ contract Voting{
 		if(!voted[voter]){	// nu lasa o persoana sa voteze de mai multe ori
 			voted[voter] = true;
 			proposals[proposal].voteCount++;
+			whatVote[voter] = proposal;
 		}
         
         emit LogVote(voter, proposals[proposal].name, proposals[proposal].voteCount);
     }
-
+    
+    function didIVoted() public view returns (bool){
+        address voter = msg.sender;
+        if(voted[voter])
+            return true;
+        return false;
+    }
+    
+    function whatIVoted() public view returns (uint){
+        address voter = msg.sender;
+        if(didIVoted()){
+            return whatVote[voter];
+        }
+    }
 }
