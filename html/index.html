@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting</title>
+
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.3.5/dist/web3.min.js" crossorigin="anonymous"></script>
+
+    <script src="script.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>Voteaza in blockchain</h1>
+
+        <h2 id="instructor">Propuneri Curente<br>
+          <ol id="props_list">
+          </ol>
+        </h2>
+        <label for="propunere" class="col-lg-2 control-label">Alegerea Dumneavoastra</label>
+        <select id="select_list" type="text">
+          <option value="-1">Nimic</option>
+        </select>
+        <button type="button" name="voteaza" id="stampila">Voteaza!</button>
+
+        <label for="propunere" class="col-lg-2 control-label">Alta propunere?</label>
+        <input id="propunere" type="text">
+
+        <button id="new_prop">Adauga propunerea</button>
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+</body>
+</html>
