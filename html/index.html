@@ -15,27 +15,30 @@
 <body>
     <div class="container">
 
-        <h1>Voteaza in blockchain</h1>
+        <h1 id="titlu">Block Chain Voteting</h1>
 
-        <h2 id="instructor">Propuneri Curente<br>
+        <h2 id="propuneri" class="mix">Propuneri Curente<br>
           <ol id="props_list">
           </ol>
         </h2>
+        <div class="centru">
+        <label for="name" class="col-lg-2 control-label">Alta propunere?</label>
+        <input id="propunere" type="text" class="mix">
+
+        <button id="new_prop">Adauga propunerea</button>
         <label for="propunere" class="col-lg-2 control-label">Alegerea Dumneavoastra</label>
         <select id="select_list" type="text">
           <option value="-1">Nimic</option>
         </select>
-        <button type="button" name="voteaza" id="stampila">Voteaza!</button>
+        <button type="button" name="voteaza" id="stampila" class="mix">Voteaza!</button>
 
-        <label for="propunere" class="col-lg-2 control-label">Alta propunere?</label>
-        <input id="propunere" type="text">
+        <button type="button" id="show_votes">Arata voturile</button>
+        </div>
 
-        <button id="new_prop">Adauga propunerea</button>
+
 
 
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 
 </body>
 </html>

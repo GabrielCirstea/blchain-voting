@@ -58,11 +58,10 @@ contract Voting{
 		// ar trebui facut ceva care sa dea o eroare cand o persoana a votat deja
 		// vrem ca o persoana sa voteze o singura data
 		// sau sa poata vota mai multe propuneri?
-		if(!voted[voter]){	// nu lasa o persoana sa voteze de mai multe ori
-			voted[voter] = true;
-			proposals[proposal].voteCount++;
-			whatVote[voter] = proposal;
-		}
+	
+		voted[voter] = true;
+		proposals[proposal].voteCount++;
+		whatVote[voter] = proposal;
         
         emit LogVote(voter, proposals[proposal].name, proposals[proposal].voteCount);
     }

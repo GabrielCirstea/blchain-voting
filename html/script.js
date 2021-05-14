@@ -200,17 +200,19 @@ let ABI = [
 
 
 
-  let myAccount;
-  var VotingContract;
-  web3.eth.getAccounts(async function(err,accounts){
-      myAccount = accounts[1];
-      console.log("Cont:",myAccount);
-      VotingContract = new web3.eth.Contract(ABI, '0xEAB6Ea5F38608C5624123B25d766a31C570E7aA8',
-        {from: myAccount}
-      );
-      // test();
-      await listProposals();
-    });
+let allAccounts;
+let myAccount;
+var VotingContract;
+web3.eth.getAccounts(async function(err,accounts){
+    allAccounts = accounts;
+    myAccount = accounts[0];
+    console.log("Cont:",myAccount);
+    VotingContract = new web3.eth.Contract(ABI, '0x6053360D7D9c5Cef069F166aA9c84E33542DDf69',
+      {from: myAccount, gas: 5000000}
+    );
+    // await test();
+    await listProposals();
+  });
 
 function test(){
     VotingContract.methods.addProposal("primul").send(function(err, res) {
@@ -230,12 +232,13 @@ function test(){
     })
     VotingContract.methods.vote(0).send({from: myAccount}, function(err, res) {
      if (err) {
-         console.log("An error occured", err);
+         console.log("An error occured in test vote", err);
          return
      }
      console.log("Am votat ",0, res)
      })
 }
+
 async function listProposals(){
     let N = 0;
     await VotingContract.methods.getNumProposals().call(function(err, res) {
@@ -255,12 +258,18 @@ async function listProposals(){
 }
 
 function fillPropList(proposals){ // also the selecte
-
   let list = document.getElementById("props_list");
   let select_list = document.getElementById("select_list");
   while (list.firstChild) {
        list.removeChild(list.firstChild);
    }
+   while (select_list.firstChild) {
+        select_list.removeChild(select_list.firstChild);
+    }
+  let opt = document.createElement("option");
+  opt.innerHTML="Nimic";
+  opt.value=-1;
+  select_list.appendChild(opt);
   let i = 0;
   for(prop of proposals){
     let li = document.createElement("li");
@@ -275,6 +284,46 @@ function fillPropList(proposals){ // also the selecte
   }
 }
 
+async function getVotesCount(){
+  let already_voted = false;
+  await VotingContract.methods.didIVoted().call({from: myAccount}, function(err, res) {
+    if (err) {
+        console.log("An error occured", err);
+        return
+    }
+    console.log("Am votat ", res)
+      already_voted = res;
+  });
+  if(already_voted == false){
+    alert("Trebuie sa votezi, ca sa vezi voturile");
+    return;
+  }
+  let N = 0;
+  await VotingContract.methods.getNumProposals().call(function(err, res) {
+    if (err) {
+        console.log("An error occured nr", err);
+        return
+    }
+    console.log("Nr Propuneri",res);
+    N = res;
+  });
+  let votes = new Array(N);
+  for(let i=0; i<N; i++){
+    votes[i] = await VotingContract.methods.getProposalCount(i).call();
+  }
+  appendVotes(votes);
+}
+
+function appendVotes(votes){
+  let list = document.getElementById("props_list");
+  let proposals = list.getElementsByTagName("li");
+  let i = 0;
+  for(vote of votes){
+    proposals[i].innerHTML += " -> " + vote;
+    i++;
+  }
+}
+
 async function voteaza(){
     let select_list = document.getElementById("select_list");
     let selection = select_list[select_list.selectedIndex].value;
@@ -282,6 +331,8 @@ async function voteaza(){
       alert("nu poti vota \"nimic\"....");
       return;
     }
+    selection = parseInt(selection);
+    console.log(selection);
     let already_voted = false;
     await VotingContract.methods.didIVoted().call({from: myAccount}, function(err, res) {
       if (err) {
@@ -297,18 +348,20 @@ async function voteaza(){
     }
     await VotingContract.methods.vote(selection).send({from: myAccount}, function(err, res) {
       if (err) {
-          console.log("An error occured", err);
+          console.log("An error occured in vote ", err);
           return
       }
       console.log("Am votat ",selection, res)
     });
+    listProposals();
+    getVotesCount();
   }
 
 function newProp(){
     let field = document.getElementById("propunere");
     let prop = field.value;
     console.log(prop);
-    VotingContract.methods.addProposal(prop).send(function(err, res) {
+    VotingContract.methods.addProposal(prop).send({from: myAccount},function(err, res) {
     if (err) {
         console.log("An error occured", err);
         return
@@ -322,4 +375,6 @@ window.onload = () => {
   button.onclick = voteaza;
   let buton2 = document.getElementById("new_prop");
   buton2.onclick = newProp;
+  let button_show = document.getElementById("show_votes");
+  button_show.onclick = getVotesCount;
 }
