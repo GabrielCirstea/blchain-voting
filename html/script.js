@@ -203,16 +203,7 @@ let ABI = [
 let allAccounts;
 let myAccount;
 var VotingContract;
-web3.eth.getAccounts(async function(err,accounts){
-    allAccounts = accounts;
-    myAccount = accounts[0];
-    console.log("Cont:",myAccount);
-    VotingContract = new web3.eth.Contract(ABI, '0x6053360D7D9c5Cef069F166aA9c84E33542DDf69',
-      {from: myAccount, gas: 5000000}
-    );
-    // await test();
-    await listProposals();
-  });
+
 
 function test(){
     VotingContract.methods.addProposal("primul").send(function(err, res) {
@@ -257,6 +248,29 @@ async function listProposals(){
     fillPropList(proposals);
 }
 
+async function whatVoted(){
+  let already_voted = false;
+  await VotingContract.methods.didIVoted().call({from: myAccount}, function(err, res) {
+    if (err) {
+        console.log("An error occured", err);
+        return
+    }
+    console.log("Am votat ", res)
+      already_voted = res;
+  });
+  if(already_voted == false){
+    return;
+  }
+  let vote_id = await VotingContract.methods.whatIVoted().call();
+  let choise = await VotingContract.methods.getProposal(vote_id).call()
+  console.log(choise);
+  let theDiv = document.getElementsByClassName("centru")[0];
+  let txt = document.createTextNode("Ai votat "+choise);
+  let p = document.createElement('p');
+  p.appendChild(txt);
+  theDiv.appendChild(p);
+
+}
 function fillPropList(proposals){ // also the selecte
   let list = document.getElementById("props_list");
   let select_list = document.getElementById("select_list");
@@ -370,11 +384,22 @@ function newProp(){
     listProposals();
     })
 }
-window.onload = () => {
+window.onload = async () => {
+  await web3.eth.getAccounts(async function(err,accounts){
+      allAccounts = accounts;
+      myAccount = accounts[0];
+      console.log("Cont:",myAccount);
+      VotingContract = new web3.eth.Contract(ABI, '0xFd8a8c2A9E67912cd6b9Af42819cadF0340C0017',
+        {from: myAccount, gas: 5000000}
+      );
+      // await test();
+      await listProposals();
+    });
   let button = document.getElementById("stampila");
   button.onclick = voteaza;
   let buton2 = document.getElementById("new_prop");
   buton2.onclick = newProp;
   let button_show = document.getElementById("show_votes");
   button_show.onclick = getVotesCount;
+  whatVoted();
 }
