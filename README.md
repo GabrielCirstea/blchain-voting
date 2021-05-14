@@ -12,10 +12,6 @@ Instructionile pentru deploy sunt in migrations
 
 ### contracts
 
-* Colector.sol - mic demo de tranzactii
-* metCoin.sol - un demo din documentatia truffle
-* myFirstContract.sol - de la profa de lab
-* simple_counter.sol - functii scrise in solidity pentru exersare
 * Voting.sol - are potential de proiect
 
 ### migrations
